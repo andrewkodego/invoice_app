@@ -13,7 +13,7 @@ class UpdateInvoiceRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +24,14 @@ class UpdateInvoiceRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'inv_number' => 'required|unique:invoices|max:15',
+            'inv_to'=> 'required|max:50',
+            'inv_contact_number'=>'required|max:20',
+            'inv_date'=>'required|date',
+            'inv_currency'=>'required|integer',
+            'inv_status'=>'required|integer',
+            'inv_payment_method'=>'required|integer',
+            'inv_delivery_address'=>'required|max:500',
         ];
     }
 }

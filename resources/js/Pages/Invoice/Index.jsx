@@ -1,3 +1,4 @@
+import PrimaryButton from '@/Components/PrimaryButton';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Inertia } from '@inertiajs/inertia';
 import { Head, Link } from '@inertiajs/inertia-react';
@@ -26,6 +27,9 @@ export default function Invoices(props) {
 
     }
 
+    const onAddHandler = ()=>{
+        Inertia.get(route('invoices.create'));
+    }
 
     return (
         <AuthenticatedLayout
@@ -35,13 +39,11 @@ export default function Invoices(props) {
         >
             <Head title="Invoices" />
 
-            <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <Link className="flex items-center px-6 py-4 focus:text-indigo-500" href={route('invoices.create')}>
-                    +Add
-                </Link>
+            <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 pt-4">
+                <PrimaryButton type='button' onClick={onAddHandler}>+Add</PrimaryButton>
             </div>
 
-            <div className="pt-12">
+            <div className="pt-6">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6 text-gray-900">
@@ -83,7 +85,7 @@ export default function Invoices(props) {
                                         <tr className="text-left font-bold">
 
                                             <td className="pb-4 pt-6 px-6">
-                                                <Link className="flex items-center px-6 py-4 focus:text-indigo-500" href={`/admin/invoices/${item.inv_id}/edit`}>
+                                                <Link className="flex items-center px-6 py-4 focus:text-indigo-500" href={`/invoices/${item.inv_id}/edit`}>
                                                     {item.inv_number}
                                                 </Link>
                                             </td>

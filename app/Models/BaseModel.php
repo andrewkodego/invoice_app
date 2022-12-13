@@ -11,7 +11,7 @@ class BaseModel extends Model
 {
     use HasFactory, SoftDeletes, DropDownListOptions;
 
-    protected $primaryKey = "inv_id";
+    protected $primaryKey = "";
 
     protected $dates = ['created_at', 'updated_at','deleted_at','inv_date'];
 
