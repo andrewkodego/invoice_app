@@ -10,6 +10,7 @@ use Inertia\Inertia;
 use Illuminate\Http\Request;
 use App\Services\InvoiceService as IModelService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class InvoiceController extends Controller
 {
@@ -27,9 +28,15 @@ class InvoiceController extends Controller
      */
     public function index(Request $request)
     {
-        $resultList = $this->modelService->getList($request->all());
+
+        $status = $this->getStatusSession($request);
+
+        $resultList = $this->modelService->getList($request->all(), true);
+
         return Inertia::render('Invoice/Index', [
-            'invoices'=> $resultList,
+            'invoices'=> $resultList->items(),
+            'pagination'=> $resultList->links(),
+            'status'=>$status,
         ]);
     }
 
@@ -72,6 +79,8 @@ class InvoiceController extends Controller
         $recordData->inv_delivery_address = $validatedData['inv_delivery_address'];
         $recordData->save();
 
+        $this->setStatusSession('Invoice record '.$recordData->inv_number.' has been added.');
+
         return redirect('/invoices');
 
     }
@@ -95,6 +104,8 @@ class InvoiceController extends Controller
      */
     public function edit(Invoice $invoice)
     {
+        $invoice->invoiceDate = $invoice->invoiceDate;
+
         return Inertia::render('Invoice/Edit', [
             'invoice'=> $invoice,
             'currencyList' => $invoice->getCurrencyList(),
@@ -112,9 +123,10 @@ class InvoiceController extends Controller
      */
     public function update(UpdateInvoiceRequest $request, Invoice $invoice)
     {
+
         $validatedData = $request->validated();
 
-        $invoice->updated_by = Auth::user()->id;
+        $invoice->modified_by = Auth::user()->id;
         $invoice->inv_number = $validatedData['inv_number'];
         $invoice->inv_to = $validatedData['inv_to'];
         $invoice->inv_contact_number = $validatedData['inv_contact_number'];
@@ -124,6 +136,8 @@ class InvoiceController extends Controller
         $invoice->inv_payment_method = $validatedData['inv_payment_method'];
         $invoice->inv_delivery_address = $validatedData['inv_delivery_address'];
         $invoice->save();
+
+        $this->setStatusSession('Invoice record '.$invoice->inv_number.' has been updated.');
 
         return redirect('/invoices');
     }
@@ -136,6 +150,11 @@ class InvoiceController extends Controller
      */
     public function destroy(Invoice $invoice)
     {
-        //
+        $invNumber = $invoice->inv_number;
+        $invoice->delete();
+
+        $this->setStatusSession('Invoice record '.$invNumber.' has been deleted.');
+
+        return redirect('/invoices');
     }
 }

@@ -24,7 +24,7 @@ class UpdateInvoiceRequest extends FormRequest
     public function rules()
     {
         return [
-            'inv_number' => 'required|unique:invoices|max:15',
+            'inv_number' => 'required|unique:invoices,inv_number,'.$this->get('inv_id'). ',inv_id|max:15',
             'inv_to'=> 'required|max:50',
             'inv_contact_number'=>'required|max:20',
             'inv_date'=>'required|date',

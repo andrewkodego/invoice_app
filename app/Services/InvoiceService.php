@@ -9,7 +9,7 @@ class InvoiceService extends AbstractModelService implements IModelService{
 
     use DropDownListOptions;
 
-    public function getList($filters){
+    public function getList($filters, $paginate=false){
 
         $resultList = Invoice::with('createdBy');
 
@@ -37,7 +37,11 @@ class InvoiceService extends AbstractModelService implements IModelService{
             $resultList->where('inv_date','<=', $filters['date_to']);
         }
         
-        return $resultList->get();
+        if($paginate){
+            return $resultList->paginate(5);
+        }else{
+            return $resultList->get();
+        }
 
     }
 

@@ -1,4 +1,5 @@
 import PrimaryButton from '@/Components/PrimaryButton';
+import DangerButton from '@/Components/DangerButton';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Inertia } from '@inertiajs/inertia';
 import { Head, Link } from '@inertiajs/inertia-react';
@@ -31,6 +32,7 @@ export default function Invoices(props) {
         Inertia.get(route('invoices.create'));
     }
 
+
     return (
         <AuthenticatedLayout
             auth={props.auth}
@@ -41,6 +43,7 @@ export default function Invoices(props) {
 
             <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 pt-4">
                 <PrimaryButton type='button' onClick={onAddHandler}>+Add</PrimaryButton>
+                <div>{props.status}</div>
             </div>
 
             <div className="pt-6">
@@ -58,7 +61,7 @@ export default function Invoices(props) {
                                     <input type="date" className="form-control" name="date_to" placeholder="Date To" onChange={handleChange}/>
                                 </div>
                                 <div className="col-sm-2">
-                                    <button className="rounded-full" onClick={doSearchHandler}>Search</button>
+                                    <PrimaryButton type='button' onClick={doSearchHandler}>Search</PrimaryButton>
                                 </div>
                             </div>
                         </div>
@@ -82,8 +85,8 @@ export default function Invoices(props) {
                             <tbody>
                                 {props.invoices.map((item)=>{
                                     return (
-                                        <tr className="text-left font-bold">
 
+                                        <tr className="text-left font-bold">
                                             <td className="pb-4 pt-6 px-6">
                                                 <Link className="flex items-center px-6 py-4 focus:text-indigo-500" href={`/invoices/${item.inv_id}/edit`}>
                                                     {item.inv_number}
@@ -103,6 +106,8 @@ export default function Invoices(props) {
                     </div>
                 </div>
             </div>
+           
+
         </AuthenticatedLayout>
     );
 }

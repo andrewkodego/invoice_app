@@ -1,35 +1,51 @@
-import Dropdown from '@/Components/Dropdown';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
+import DangerButton from '@/Components/DangerButton';
+import Select from '@/Components/Select';
 import TextInput from '@/Components/TextInput';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Inertia } from '@inertiajs/inertia';
-import { Head, Link } from '@inertiajs/inertia-react';
-import { filter, get } from 'lodash';
-import { useEffect, useState } from 'react';
-
+import { Head, useForm } from '@inertiajs/inertia-react';
+import Modal from '@/Components/Modal';
+import SecondaryButton from '@/Components/SecondaryButton';
+import { useState } from 'react';
 
 export default function Invoices(props) {
 
-    const [fieldData, setFieldData] = useState({id: props.invoice.inv_id > 0 ? props.invoice.inv_id : 0, _method: 'PUT'});
+    const { data, setData, post, processing, errors, transform } = useForm(props.invoice);
+    const [confirmDelete, setConfirmDelete] = useState(false);
 
     const handleChange = (event) => {
         const fieldName = event.target.name;
         const fieldValue = event.target.value;
-        setFieldData(values=>({...values, [fieldName]: fieldValue}));
+        setData(data=>({...data, [fieldName]: fieldValue}));
     }
 
     const onSaveHandler = (event) =>{
+        event.preventDefault();
+
         if(props.invoice.inv_id > 0){
-            Inertia.post('/invoices', fieldData); 
+            Inertia.put('/invoices/'+ props.invoice.inv_id, data); 
         }else{
-            Inertia.post(route('invoices.store'), fieldData); 
+            Inertia.post(route('invoices.store'), data); 
         }        
     }
 
     const onCancelHandler = ()=>{
         Inertia.get(route('invoices.index')); 
     }
+
+    const doConfirmDelete = () =>{
+        setConfirmDelete(true);
+    }
+
+    const doDeleteHandler =() =>{
+        Inertia.delete('/invoices/'+ props.invoice.inv_id); 
+    }
+
+    const closeModal = () => {
+        setConfirmDelete(false);
+    };
 
     return (
         <AuthenticatedLayout
@@ -44,40 +60,44 @@ export default function Invoices(props) {
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6 text-gray-900">
 
-                            <form className="mt-6 space-y-6">                              
-                                <div class="grid grid-cols-2 gap-4">
+                            <form className="mt-6 space-y-6" onSubmit={onSaveHandler}>   
+
+                                <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <InputLabel for="invoice_number" value="Invoice #"/>
 
                                         <TextInput id="invoice_number" className="mt-1 block w-full"
                                             name="inv_number"
-                                            value={props.invoice.inv_number}
+                                            value={data.inv_number}
                                             handleChange={handleChange}
-                                            requireds
+                                            required
                                             autofocus 
                                         />
+                                        <div className="text-red-500">{props.errors.inv_number}</div>
                                     </div>
                                     <div>
                                         <InputLabel for="invoice_to" value="Invoice To"/>
 
                                         <TextInput id="invoice_to" className="mt-1 block w-full"
                                             name="inv_to"
-                                            value={props.invoice.inv_to}
+                                            value={data.inv_to}
                                             handleChange={handleChange}
                                             required
                                         />
+                                        <div className="text-red-500">{props.errors.invoice_to}</div>
                                     </div>
                                 </div>
-                                <div class="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <InputLabel for="contact_number" value="Contact #"/>
 
                                         <TextInput id="contact_number" className="mt-1 block w-full"
                                             name="inv_contact_number"
-                                            value={props.invoice.inv_contact_number}
+                                            value={data.inv_contact_number}
                                             handleChange={handleChange}
                                             required
                                         />
+                                        <div className="text-red-500">{props.errors.inv_contact_number}</div>
                                     </div>
 
                                     <div>
@@ -86,64 +106,81 @@ export default function Invoices(props) {
                                         <TextInput id="invoice_date" className="mt-1 block w-full"
                                             type="date"
                                             name="inv_date"
-                                            value={props.invoice.inv_date}
+                                            value={data.invoiceDate}
                                             handleChange={handleChange}
                                             required
                                         />
                                     </div>
                                 </div>
-                                <div class="grid grid-cols-3 gap-4">
+                                <div className="grid grid-cols-3 gap-4">
                                     <div>
                                         <InputLabel for="currency" value="Currency"/>
 
-                                        <select id="currency" className="mt-1 block w-full" name="inv_currency" onChange={handleChange} 
-                                            defaultValue={props.invoice.inv_currency}>
-                                            <option value=''>-- Select Currency --</option>    
-                                            {props.currencyList.map((item)=>
-                                                <option value={item.cur_id}>{item.cur_code}</option>    
-                                            )}
-                                        </select>
+                                        <Select id="currency" className="mt-1 block w-full"
+                                            name="inv_currency"                                            
+                                            value={data.inv_currency}
+                                            handleChange={handleChange} 
+                                            options={props.currencyList}
+                                            placeholder="-- Select Currency --"
+                                            optionLabel="cur_code"
+                                            optionValue="cur_id"
+                                            required/>
                                         
                                     </div>
 
                                     <div>
                                         <InputLabel for="status" value="Status"/>
 
-                                        <select id="status" className="mt-1 block w-full" name="inv_status" onChange={handleChange}>
-                                            <option value=''>-- Select Status --</option>    
-                                            {props.statusList.map((item)=>
-                                                <option value={item.opt_id}>{item.opt_name}</option>    
-                                            )}
-                                        </select>
-                                        
+                                        <Select id="status" className="mt-1 block w-full"
+                                            name="inv_status"                                            
+                                            value={data.inv_status}
+                                            handleChange={handleChange} 
+                                            options={props.statusList}
+                                            placeholder="-- Select Status --"
+                                            required/>
+
                                     </div>
                                     <div>
                                         <InputLabel for="payment_mehtod" value="Payment Method"/>
 
-                                        <select id="payment_mehtod" className="mt-1 block w-full" name="inv_payment_method" onChange={handleChange}>
-                                            <option value=''>-- Select Payment Method --</option>    
-                                            {props.paymentMethodList.map((item)=>
-                                                <option value={item.opt_id}>{item.opt_name}</option>    
-                                            )}
-                                        </select>
+                                        <Select id="payment_mehtod" className="mt-1 block w-full"
+                                            name="inv_payment_method"                                            
+                                            value={data.inv_payment_method}
+                                            handleChange={handleChange} 
+                                            options={props.paymentMethodList}
+                                            placeholder="-- Select Payment Method --"
+                                            required/>
                                         
                                     </div>
                                 </div>
-                                <div class="grid">
+                                <div className="grid">
                                     <InputLabel for="delivery_address" value="Delivery Address"/>
 
                                     <textarea id="delivery_address" name="inv_delivery_address" className="mt-1 block w-full" onChange={handleChange}>
-                                        {props.invoice.inv_delivery_address}
+                                        {data.inv_delivery_address}
                                     </textarea>
                                     
                                 </div>
-
+                                <div className="flex items-center gap-4 py-4">
+                                    <DangerButton type='button' onClick={doConfirmDelete}>Delete</DangerButton>
+                                    <SecondaryButton type='button' onClick={onCancelHandler}>Cancel</SecondaryButton>
+                                    <PrimaryButton type='submit' disabled={processing}>Save</PrimaryButton>
+                            </div>
                             </form>
 
-                            <div className="flex items-center gap-4 py-4">
-                                <PrimaryButton type='button' onClick={onCancelHandler}>Cancel</PrimaryButton>
-                                <PrimaryButton type='button' onClick={onSaveHandler}>Save</PrimaryButton>
-                            </div>
+                            <Modal show={confirmDelete} onClose={closeModal}>
+                                <div className="p-6 text-gray-900">
+                                    <h2 className="text-lg font-medium text-gray-900 text-center">
+                                        Are you sure you want to delete this record?
+                                    </h2>
+                                    <div className="mt-6 flex justify-center">
+                                        <SecondaryButton onClick={closeModal}>No</SecondaryButton>
+                                        <DangerButton className="ml-3" processing={processing} onClick={doDeleteHandler}>
+                                            Yes
+                                        </DangerButton>
+                                    </div>
+                                </div>
+                            </Modal>
 
                         </div>
                     </div>

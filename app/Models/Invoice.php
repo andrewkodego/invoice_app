@@ -8,8 +8,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Invoice extends BaseModel
 {
-    //use HasFactory, SoftDeletes;
-
     protected $primaryKey = "inv_id";
 
     protected $dates = ['created_at', 'updated_at','deleted_at','inv_date'];
@@ -31,7 +29,7 @@ class Invoice extends BaseModel
     }
 
     public function getInvoiceDateAttribute(){
-        return $this->inv_date->format("d/m/Y");
+        return $this->inv_date->format("Y-m-d");
     }
 
 
