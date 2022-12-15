@@ -5,6 +5,7 @@ import { Inertia } from '@inertiajs/inertia';
 import { Head, Link } from '@inertiajs/inertia-react';
 import { filter, get } from 'lodash';
 import { useEffect, useState } from 'react';
+import Pagination from '@/Components/Pagination';
 
 
 export default function Invoices(props) {
@@ -73,39 +74,40 @@ export default function Invoices(props) {
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6 text-gray-900">
-                        <table className="w-full whitespace-nowrap">
-                            <thead>
-                            <tr className="text-left font-bold">
-                                <th className="pb-4 pt-6 px-6">Invoice #</th>
-                                <th className="pb-4 pt-6 px-6">Invoice To</th>
-                                <th className="pb-4 pt-6 px-6">Date</th>
-                                <th className="pb-4 pt-6 px-6">Amount</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                                {props.invoices.map((item)=>{
-                                    return (
+                            <table className="w-full whitespace-nowrap">
+                                <thead>
+                                <tr className="text-left font-bold">
+                                    <th className="pb-4 pt-6 px-6">Invoice #</th>
+                                    <th className="pb-4 pt-6 px-6">Invoice To</th>
+                                    <th className="pb-4 pt-6 px-6">Date</th>
+                                    <th className="pb-4 pt-6 px-6">Amount</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    {props.invoices.data.map((item)=>{
+                                        return (
 
-                                        <tr className="text-left font-bold">
-                                            <td className="pb-4 pt-6 px-6">
-                                                <Link className="flex items-center px-6 py-4 focus:text-indigo-500" href={`/invoices/${item.inv_id}/edit`}>
-                                                    {item.inv_number}
-                                                </Link>
-                                            </td>
-                                            <td className="pb-4 pt-6 px-6">{item.inv_to}</td>
-                                            <td className="pb-4 pt-6 px-6">{item.inv_date}</td>
-                                            <td className="pb-4 pt-6 px-6">{item.inv_amount}</td>
-                                        </tr>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
-
-                            
+                                            <tr className="text-left font-bold">
+                                                <td className="pb-4 pt-6 px-6">
+                                                    <Link className="flex items-center px-6 py-4 focus:text-indigo-500" href={`/invoices/${item.inv_id}/edit`}>
+                                                        {item.inv_number}
+                                                    </Link>
+                                                </td>
+                                                <td className="pb-4 pt-6 px-6">{item.inv_to}</td>
+                                                <td className="pb-4 pt-6 px-6">{item.inv_date}</td>
+                                                <td className="pb-4 pt-6 px-6">{item.inv_amount}</td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        
+                            <Pagination resultList={props.invoices}/>
                         </div>
                     </div>
                 </div>
             </div>
+           
            
 
         </AuthenticatedLayout>

@@ -18,16 +18,21 @@ export default function Invoices(props) {
     const handleChange = (event) => {
         const fieldName = event.target.name;
         const fieldValue = event.target.value;
-        setData(data=>({...data, [fieldName]: fieldValue}));
+
+        if(fieldName == 'attachment'){
+            setData(data=>({...data, [fieldName]: event.target.files[0]}));
+        }else{
+            setData(data=>({...data, [fieldName]: fieldValue}));
+        }
     }
 
     const onSaveHandler = (event) =>{
         event.preventDefault();
 
         if(props.invoice.inv_id > 0){
-            Inertia.put('/invoices/'+ props.invoice.inv_id, data); 
+            Inertia.put('/invoices/'+ props.invoice.inv_id, data, {forceFormData: true}); 
         }else{
-            Inertia.post(route('invoices.store'), data); 
+            Inertia.post(route('invoices.store'), data, {forceFormData: true}); 
         }        
     }
 
@@ -161,6 +166,20 @@ export default function Invoices(props) {
                                     </textarea>
                                     
                                 </div>
+                                <div className="grid">
+                                    <InputLabel for="delivery_address" value="Attachment"/>
+
+                                    <TextInput id="invoice_date" className="mt-1 block w-full"
+                                            type="file"
+                                            name="attachment"
+                                            handleChange={handleChange}
+                                        />
+                                    
+                                    <div>{data.attachmentFile}</div>
+
+
+                                </div>
+
                                 <div className="flex items-center gap-4 py-4">
                                     <DangerButton type='button' onClick={doConfirmDelete}>Delete</DangerButton>
                                     <SecondaryButton type='button' onClick={onCancelHandler}>Cancel</SecondaryButton>

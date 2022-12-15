@@ -34,8 +34,7 @@ class InvoiceController extends Controller
         $resultList = $this->modelService->getList($request->all(), true);
 
         return Inertia::render('Invoice/Index', [
-            'invoices'=> $resultList->items(),
-            'pagination'=> $resultList->links(),
+            'invoices'=> $resultList,
             'status'=>$status,
         ]);
     }
@@ -79,6 +78,12 @@ class InvoiceController extends Controller
         $recordData->inv_delivery_address = $validatedData['inv_delivery_address'];
         $recordData->save();
 
+        $attachment = $this->saveAttachmentFile($request);
+        if($attachment){
+            $attachment->att_description = 'Invoice attachment file';
+            $recordData->attachment()->save($attachment);
+        }
+
         $this->setStatusSession('Invoice record '.$recordData->inv_number.' has been added.');
 
         return redirect('/invoices');
@@ -105,6 +110,7 @@ class InvoiceController extends Controller
     public function edit(Invoice $invoice)
     {
         $invoice->invoiceDate = $invoice->invoiceDate;
+        $invoice->attachmentFile = $invoice->attachmentFile;
 
         return Inertia::render('Invoice/Edit', [
             'invoice'=> $invoice,

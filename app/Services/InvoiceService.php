@@ -38,7 +38,7 @@ class InvoiceService extends AbstractModelService implements IModelService{
         }
         
         if($paginate){
-            return $resultList->paginate(5);
+            return $resultList->paginate(config('constants.PAGINATION_COUNT'));
         }else{
             return $resultList->get();
         }
